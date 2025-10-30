@@ -6,8 +6,8 @@ app = Flask(__name__)
  
 class BettingSystem: 
     def __init__(self): 
-        self.teams_br = ['Flamengo', 'Palmeiras', 'S∆o Paulo', 'Corinthians', 'Gràmio'] 
-        self.leagues = ['Brasileir∆o SÇrie A', 'Libertadores', 'Premier League'] 
+        self.teams_br = ['Flamengo', 'Palmeiras', 'Sao Paulo', 'Corinthians', 'Gremio'] 
+        self.leagues = ['Brasileirao Serie A', 'Libertadores', 'Premier League'] 
         self.markets = ['Over 2.5 Gols', 'Ambos Marcam', 'Under 2.5 Gols'] 
  
     def generate_data(self): 
