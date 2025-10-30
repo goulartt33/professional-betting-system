@@ -13,13 +13,12 @@ from ai_engine import AIBettingEngine
 from ticket_generator import SmartTicketGenerator
 from telegram_bot import ProfessionalTelegramBot
 
-# Configuração de logging
+# Configuração de logging para Render
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('logs/betting_system.log'),
-        logging.StreamHandler()
+        logging.StreamHandler()  # Para Render logs
     ]
 )
 
@@ -50,13 +49,12 @@ class ProfessionalBettingSystem:
                 await self.telegram_bot._send_message("⚠️ *Nenhum jogo encontrado para análise hoje*")
                 return
 
-            self.logger.info(f"📊 Encontrados {len(matches)} jogos para análise")
+            self.logger.info(f"📊 Analisando {len(matches)} jogos...")
             
             # Análise com IA
             opportunities = []
             for match in matches:
                 try:
-                    # Análise de diferentes mercados
                     over_under_opp = self.ai_engine.analyze_over_under(match)
                     btts_opp = self.ai_engine.analyze_both_teams_score(match)
                     corners_opp = self.ai_engine.analyze_corners(match)
@@ -64,7 +62,7 @@ class ProfessionalBettingSystem:
                     opportunities.extend([over_under_opp, btts_opp, corners_opp])
                     
                 except Exception as e:
-                    self.logger.error(f"❌ Erro analisando jogo {match.home_team} vs {match.away_team}: {e}")
+                    self.logger.error(f"❌ Erro analisando {match.home_team} vs {match.away_team}: {e}")
                     continue
 
             # Gera bilhetes inteligentes
@@ -79,33 +77,14 @@ class ProfessionalBettingSystem:
             self.logger.error(f"❌ Erro na análise diária: {e}")
             await self.telegram_bot._send_message(f"❌ *Erro no sistema:* {str(e)}")
 
-    async def run(self):
-        """Executa o sistema continuamente"""
-        self.logger.info("🤖 Sistema Profissional de Apostas Iniciado")
-        
-        # Executa análise imediatamente na primeira vez
+    async def run_once(self):
+        """Executa uma única análise (para Render)"""
         await self.run_daily_analysis()
-        
-        while True:
-            try:
-                # Verifica se é horário de análise (09:00 AM)
-                now = datetime.now()
-                if now.hour == 9 and now.minute == 0:
-                    self.logger.info("⏰ Horário de análise - Executando...")
-                    await self.run_daily_analysis()
-                    await asyncio.sleep(60)  # Espera 1 minuto para evitar repetição
-                else:
-                    await asyncio.sleep(30)  # Verifica a cada 30 segundos
-                    
-            except Exception as e:
-                self.logger.error(f"❌ Erro no loop principal: {e}")
-                await asyncio.sleep(60)
 
 async def main():
     system = ProfessionalBettingSystem()
-    await system.run()
+    await system.run_once()
 
 if __name__ == "__main__":
-    # Cria diretório de logs se não existir
-    os.makedirs('logs', exist_ok=True)
+    # Para Render - executa uma vez e sai
     asyncio.run(main())

@@ -1,2 +1,2 @@
-web: gunicorn src.main:app --bind 0.0.0.0:$PORT --worker-class aiohttp.GunicornWebWorker
+web: python src/main.py
 worker: python src/main.py
